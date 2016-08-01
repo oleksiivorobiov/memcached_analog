@@ -1,3 +1,6 @@
 [submodule "__submoudles/googletest"]
 	path = __submoudles/googletest
 	url = git@github.com:google/googletest.git
+[submodule "__submoudles/asio"]
+	path = __submoudles/asio
+	url = git@github.com:chriskohlhoff/asio.git
