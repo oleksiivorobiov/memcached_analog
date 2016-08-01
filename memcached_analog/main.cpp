@@ -13,8 +13,16 @@ int run_server(int argc, char **argv)
       std::cerr << "Usage: " << argv[0] << " <port>\n";
       return 1;
     }
-
     short port = std::atoi(argv[1]);
+
+    std::cout << "server listen localhost on port " << port << "\n"
+      << "accepted commands:\n"
+      << "set <key> <val> [<time to live in sec>]\n"
+      << "get <key>\n"
+      << "remove <key>\n"
+      << "usr1(save cache in file)\n";
+
+
     auto cache = std::make_shared<Cache>();
     Protocol protocol(cache);
     //ThreadedServer server(port, protocol);
