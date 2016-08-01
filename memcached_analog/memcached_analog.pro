@@ -5,14 +5,22 @@ CONFIG -= qt
 CONFIG += c++11
 
 INCLUDEPATH += ../__submoudles/googletest/googletest/include \
-  ../__submoudles/googletest/googletest
+  ../__submoudles/googletest/googletest \
+  ../__submoudles/asio/asio/include
 
 LIBS += -pthread
+
+DEFINES += ASIO_STANDALONE
 
 SOURCES += main.cpp \
   cache.cpp \
     ../__submoudles/googletest/googletest/src/gtest-all.cc \
-    cache_test.cpp
+    cache_test.cpp \
+    server.cpp \
+    protocol.cpp \
+    protocol_test.cpp
 
 HEADERS += \
-  cache.h
+  cache.h \
+    server.h \
+    protocol.h
