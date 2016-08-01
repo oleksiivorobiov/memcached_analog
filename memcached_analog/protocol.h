@@ -16,6 +16,7 @@ class Protocol
 
   std::shared_ptr<CacheInterface> _cache;
 public:
+  static const std::string SAVE_PATH;
   Protocol(std::shared_ptr<CacheInterface> Cache);
   std::string process(const std::string &text);
 };

@@ -30,6 +30,10 @@ public:
     this->val = "";
     this->ttl = 0;
   }
+  void save(const std::string &) override
+  {
+    cmd = "save";
+  }
 };
 
 TEST(ProtocolTest, ShouldReturnInvalidCommandInCaseInvalidFormat) {
@@ -44,6 +48,9 @@ TEST(ProtocolTest, ShouldReturnInvalidCommandInCaseInvalidFormat) {
 TEST(ProtocolTest, ShouldAcceptValid) {
   auto spy = std::make_shared<CacheSpy>();
   Protocol p(spy);
+
+  ASSERT_EQ("saved in /tmp/memcached_analog.txt", p.process("usr1"));
+  ASSERT_EQ("save", spy->cmd);
 
   ASSERT_EQ("", p.process("get key"));
   ASSERT_EQ("get", spy->cmd);
