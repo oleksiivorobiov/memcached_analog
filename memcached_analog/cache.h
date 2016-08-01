@@ -13,6 +13,7 @@ public:
   virtual void set(const std::string &key, const std::string &val, unsigned int ttl_sec = 0) = 0;
   virtual std::string get(const std::string &key) = 0;
   virtual void remove(const std::string &key) = 0;
+  virtual void save(const std::string &file_path) = 0;
 };
 
 class Cache : public CacheInterface
@@ -41,6 +42,7 @@ public:
   void set(const std::string &key, const std::string &val, unsigned int ttl_sec = 0) override;
   std::string get(const std::string &key) override;
   void remove(const std::string &key) override;
+  void save(const std::string &file_path) override;
 };
 
 #endif // CACHE_H

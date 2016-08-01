@@ -1,4 +1,5 @@
 #include "cache.h"
+#include <fstream>
 
 int Cache::Invalidator::get_curr_ttl_sec(const std::chrono::system_clock::time_point &expiration)
 {
@@ -94,4 +95,13 @@ void Cache::remove(const std::string &key)
 {
   std::lock_guard<std::mutex> lock(_mutex);
   _data.erase(key);
+}
+
+void Cache::save(const std::string &file_path)
+{
+  std::ofstream out(file_path);
+
+  std::lock_guard<std::mutex> lock(_mutex);
+  for (auto it = _data.begin(); it != _data.end(); ++it)
+    out << it->first << ": " << it->second << "\n";
 }
