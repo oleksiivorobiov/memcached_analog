@@ -6,6 +6,11 @@ class CacheTest: public ::testing::Test
 {
 public:
   Cache c;
+
+  CacheTest() : c(std::make_shared<MemoryStorage>())
+  {
+
+  }
 };
 
 TEST_F(CacheTest, ShouldBeAbleToSetItem) {

@@ -65,7 +65,7 @@ void Cache::Invalidator::stop()
   _worker.join();
 }
 
-Cache::Cache() : _invalidator(*this)
+Cache::Cache(std::shared_ptr<StorageInterface> storage) : _storage(storage), _invalidator(*this)
 {
 
 }
@@ -78,7 +78,7 @@ Cache::~Cache()
 void Cache::set(const std::string &key, const std::string &val, unsigned int ttl_sec)
 {
   std::unique_lock<std::mutex> lock(_mutex);
-  _data[key] = val;
+  _storage->set(key, val);
   lock.unlock();
 
   if (ttl_sec > 0)
@@ -88,13 +88,13 @@ void Cache::set(const std::string &key, const std::string &val, unsigned int ttl
 std::string Cache::get(const std::string &key)
 {
   std::lock_guard<std::mutex> lock(_mutex);
-  return _data[key];
+  return _storage->get(key);
 }
 
 void Cache::remove(const std::string &key)
 {
   std::lock_guard<std::mutex> lock(_mutex);
-  _data.erase(key);
+  _storage->remove(key);
 }
 
 void Cache::save(const std::string &file_path)
@@ -102,6 +102,8 @@ void Cache::save(const std::string &file_path)
   std::ofstream out(file_path);
 
   std::lock_guard<std::mutex> lock(_mutex);
-  for (auto it = _data.begin(); it != _data.end(); ++it)
-    out << it->first << ": " << it->second << "\n";
+  _storage->traverse([&](const std::string &key, const std::string &val)
+  {
+    out << key << ": " << val << "\n";
+  });
 }

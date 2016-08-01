@@ -18,9 +18,11 @@ SOURCES += main.cpp \
     cache_test.cpp \
     server.cpp \
     protocol.cpp \
-    protocol_test.cpp
+    protocol_test.cpp \
+    storage.cpp
 
 HEADERS += \
   cache.h \
     server.h \
-    protocol.h
+    protocol.h \
+    storage.h

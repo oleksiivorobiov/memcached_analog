@@ -1,11 +1,11 @@
 #ifndef CACHE_H
 #define CACHE_H
 
-#include <unordered_map>
-#include <map>
 #include <mutex>
+#include <map>
 #include <thread>
 #include <condition_variable>
+#include "storage.h"
 
 class CacheInterface
 {
@@ -33,11 +33,11 @@ class Cache : public CacheInterface
     void track(const std::string &key, unsigned int ttl_sec);
     void stop();
   };
+  std::shared_ptr<StorageInterface> _storage;
   Invalidator _invalidator;
-  std::unordered_map<std::string, std::string> _data;
   std::mutex _mutex;
 public:
-  Cache();
+  Cache(std::shared_ptr<StorageInterface> storage);
   ~Cache();
   void set(const std::string &key, const std::string &val, unsigned int ttl_sec = 0) override;
   std::string get(const std::string &key) override;

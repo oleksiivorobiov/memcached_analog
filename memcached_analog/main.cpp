@@ -23,10 +23,10 @@ int run_server(int argc, char **argv)
       << "usr1(save cache in file)\n";
 
 
-    auto cache = std::make_shared<Cache>();
+    auto cache = std::make_shared<Cache>(std::make_shared<MemoryStorage>());
     Protocol protocol(cache);
-    //ThreadedServer server(port, protocol);
-    AsyncServer server(port, protocol);
+    ThreadedServer server(port, protocol);
+    //AsyncServer server(port, protocol);
   }
   catch (const std::exception& e)
   {
