@@ -36,19 +36,26 @@ public:
   }
 };
 
-TEST(ProtocolTest, ShouldReturnInvalidCommandInCaseInvalidFormat) {
-  auto spy = std::make_shared<CacheSpy>();
-  Protocol p(spy);
+class ProtocolTest: public ::testing::Test
+{
+public:
+  std::shared_ptr<CacheSpy> spy;
+  Protocol p;
+
+  ProtocolTest() : spy(new CacheSpy), p(spy)
+  {
+
+  }
+};
+
+TEST_F(ProtocolTest, ShouldReturnInvalidCommandInCaseInvalidFormat) {
   ASSERT_EQ("invalid command", p.process(""));
   ASSERT_EQ("invalid command", p.process("set 6"));
   ASSERT_EQ("invalid command", p.process("get"));
   ASSERT_EQ("invalid command", p.process("set a "));
 }
 
-TEST(ProtocolTest, ShouldAcceptValid) {
-  auto spy = std::make_shared<CacheSpy>();
-  Protocol p(spy);
-
+TEST_F(ProtocolTest, ShouldAcceptValid) {
   ASSERT_EQ("saved in /tmp/memcached_analog.txt", p.process("usr1"));
   ASSERT_EQ("save", spy->cmd);
 
