@@ -1,2 +1,4 @@
 build-memcached_analog-*
 *.pro.user
+memcached_analog/*.o
+memcached_analog/memcached_analog
