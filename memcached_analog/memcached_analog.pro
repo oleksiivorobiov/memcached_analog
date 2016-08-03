@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     server.cpp \
     protocol.cpp \
     protocol_test.cpp \
-    storage.cpp
+    storage.cpp \
+    storage_test.cpp
 
 HEADERS += \
   cache.h \

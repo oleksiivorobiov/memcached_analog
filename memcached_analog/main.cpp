@@ -23,7 +23,7 @@ int run_server(int argc, char **argv)
       << "usr1(save cache in file)\n";
 
 
-    auto cache = std::make_shared<Cache>(std::make_shared<MemoryStorage>());
+    auto cache = std::make_shared<Cache>(std::make_shared<MmapStorage>("/tmp/memcached_analog", 1024 * 1024));
     Protocol protocol(cache);
     ThreadedServer server(port, protocol);
     //AsyncServer server(port, protocol);
