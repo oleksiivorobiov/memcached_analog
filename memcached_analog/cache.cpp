@@ -22,13 +22,11 @@ Cache::Invalidator::Invalidator(Cache &c) : _cache(&c), _stop(false), _worker([&
         int curr_ttl_sec = get_curr_ttl_sec(it->first);
         if (curr_ttl_sec <= 0)
         {
-          printf("removed\n");
           _cache->remove(it->second);
           it = _expirations.erase(it);
         }
         else
         {
-          printf("skipped sleep for %d\n", curr_ttl_sec);
           sleep_sec = curr_ttl_sec;
           // next items are not expired yet, cause map items are sorted
           break;
