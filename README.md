@@ -18,10 +18,31 @@
 
 ## классы
 
-Cache - содержит логику кеширования
-Invalidator
-MemoryStorage
-MmapStorage
-ThreadedServer
-AsyncServer
-Protocol
+Cache - содержит логику кеширования и очистки кеша по time-to-leave
+MemoryStorage / MmapStorage - хранение данных в памяти или память+файл
+ThreadedServer / AsyncServer - логика обработки соединений
+Protocol - логика текстового протокола
+
+# компиляция
+
+Нужно использовать gcc 4.9, 4.8 не поддерживает std::regex, тесты не проходят. Если нету 4.9 запускать memcached_analog_gcc49_64
+
+```
+git submodule update --init
+cd  memcached_analog
+make
+```
+
+# запуск
+```
+./memcached_analog 1234 
+```
+## запуск юнит-тестов
+```
+./memcached_analog test
+```
+
+# проверка при помощи telnet
+```
+telnet localhost 1234
+```
