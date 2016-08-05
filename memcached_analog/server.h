@@ -8,7 +8,10 @@ class ServerInterface
 {
 public:
   static const int BUF_SIZE = 1024;
-  ServerInterface(short , Protocol &) {}
+  ServerInterface(short, Protocol &) {}
+  virtual ~ServerInterface() {}
+  virtual void start() = 0;
+  virtual void stop() = 0;
 };
 
 class AsyncServer : public ServerInterface
@@ -34,12 +37,19 @@ class AsyncServer : public ServerInterface
   void accept();
 public:
   AsyncServer(short port, Protocol &protocol);
+  void start() override;
+  void stop() override;
 };
 
 class ThreadedServer : public ServerInterface
 {
+  short _port;
+  Protocol _protocol;
+  std::atomic<bool> _stop;
 public:
   ThreadedServer(short port, Protocol &protocol);
+  void start() override;
+  void stop() override;
 };
 
 #endif // SERVER_H

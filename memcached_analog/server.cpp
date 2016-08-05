@@ -36,8 +36,19 @@ void AsyncServer::Session::write(std::size_t length)
 AsyncServer::AsyncServer(short port, Protocol &protocol) : ServerInterface(port, protocol),
   _acceptor(_io_service, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)), _socket(_io_service), _protocol(protocol)
 {
+
+}
+
+void AsyncServer::start()
+{
   accept();
   _io_service.run();
+}
+
+void AsyncServer::stop()
+{
+  accept();
+  _io_service.stop();
 }
 
 void AsyncServer::accept()
@@ -51,19 +62,22 @@ void AsyncServer::accept()
   });
 }
 
+ThreadedServer::ThreadedServer(short port, Protocol &protocol) : ServerInterface(port, protocol), _protocol(protocol), _stop(false)
+{
+  _port = port;
+}
 
-ThreadedServer::ThreadedServer(short port, Protocol &protocol) : ServerInterface(port, protocol)
+void ThreadedServer::start()
 {
   asio::io_context io_context;
-
-  asio::ip::tcp::acceptor a(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
-  while (true)
+  asio::ip::tcp::acceptor a(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), _port));
+  while (!_stop)
     try {
-      std::thread([](asio::ip::tcp::socket sock, Protocol protocol)
+      std::thread([&](asio::ip::tcp::socket sock, Protocol protocol)
       {
         try
         {
-          while (true)
+          while (!_stop)
           {
             char data[BUF_SIZE];
 
@@ -83,10 +97,15 @@ ThreadedServer::ThreadedServer(short port, Protocol &protocol) : ServerInterface
         {
           std::cerr << "Exception in thread: " << e.what() << "\n";
         }
-      }, a.accept(), protocol).detach();
+      }, a.accept(), _protocol).detach();
     }
     catch (const std::exception &e)
     {
       std::cerr << "Exception ignored: " << e.what() << "\n";
     }
+}
+
+void ThreadedServer::stop()
+{
+  _stop = true;
 }

@@ -10,6 +10,7 @@ const size_t MMAP_SIZE = 1024 * 1024;
 
 std::shared_ptr<MmapStorage> storage;
 std::shared_ptr<Cache> cache;
+std::unique_ptr<ServerInterface> server;
 struct sigaction act;
 
 static void sighandler(int signo, siginfo_t *, void *)
@@ -20,6 +21,10 @@ static void sighandler(int signo, siginfo_t *, void *)
       std::cout << "saved cached data in " << SAVE_PATH_USR1 << "\n";
       break;
     default:
+      // we want to make sure data is written on the disk
+      // destructor may not called due to detached threads use shared_ptr
+      storage->sync_mem_and_file();
+      server->stop();
       break;
     }
 }
@@ -55,8 +60,9 @@ static int run_server(int argc, char **argv)
       << "get <key>\n"
       << "remove <key>\n";
 
-    //ThreadedServer server(port, protocol);
-    AsyncServer server(port, protocol);
+    server.reset(new ThreadedServer(port, protocol));
+    //server.reset(new AsyncServer(port, protocol));
+    server->start();
   }
   catch (const std::exception& e)
   {
