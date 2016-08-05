@@ -56,9 +56,6 @@ TEST_F(ProtocolTest, ShouldReturnInvalidCommandInCaseInvalidFormat) {
 }
 
 TEST_F(ProtocolTest, ShouldAcceptValid) {
-  ASSERT_EQ("saved in /tmp/memcached_analog.txt", p.process("usr1"));
-  ASSERT_EQ("save", spy->cmd);
-
   ASSERT_EQ("", p.process("get key"));
   ASSERT_EQ("get", spy->cmd);
   ASSERT_EQ("key", spy->key);

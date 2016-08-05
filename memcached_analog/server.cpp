@@ -58,29 +58,35 @@ ThreadedServer::ThreadedServer(short port, Protocol &protocol) : ServerInterface
 
   asio::ip::tcp::acceptor a(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
   while (true)
-    std::thread([](asio::ip::tcp::socket sock, Protocol protocol)
-    {
-      try
+    try {
+      std::thread([](asio::ip::tcp::socket sock, Protocol protocol)
       {
-        while (true)
+        try
         {
-          char data[BUF_SIZE];
+          while (true)
+          {
+            char data[BUF_SIZE];
 
-          asio::error_code error;
-          size_t length = sock.read_some(asio::buffer(data), error);
-          if (error == asio::error::eof)
-            break;
-          else if (error)
-            throw asio::system_error(error);
+            asio::error_code error;
+            size_t length = sock.read_some(asio::buffer(data), error);
+            if (error == asio::error::eof)
+              break;
+            else if (error)
+              throw asio::system_error(error);
 
-          std::string input(data, length);
-          auto res = protocol.process(input) + "\n";
-          asio::write(sock, asio::buffer(res, res.size()));
+            std::string input(data, length);
+            auto res = protocol.process(input) + "\n";
+            asio::write(sock, asio::buffer(res, res.size()));
+          }
         }
-      }
-      catch (std::exception& e)
-      {
-        std::cerr << "Exception in thread: " << e.what() << "\n";
-      }
-    }, a.accept(), protocol).detach();
+        catch (std::exception& e)
+        {
+          std::cerr << "Exception in thread: " << e.what() << "\n";
+        }
+      }, a.accept(), protocol).detach();
+    }
+    catch (const std::exception &e)
+    {
+      std::cerr << "Exception ignored: " << e.what() << "\n";
+    }
 }

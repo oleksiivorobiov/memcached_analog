@@ -4,7 +4,36 @@
 #include "protocol.h"
 #include "cache.h"
 
-int run_server(int argc, char **argv)
+const std::string MMAP_STORAGE = "/tmp/memcached_analog",
+                  SAVE_PATH_USR1 = "/tmp/memcached_analog_usr1";
+const size_t MMAP_SIZE = 1024 * 1024;
+
+std::shared_ptr<MmapStorage> storage;
+std::shared_ptr<Cache> cache;
+struct sigaction act;
+
+static void sighandler(int signo, siginfo_t *, void *)
+{
+  switch (signo) {
+    case SIGUSR1:
+      cache->save(SAVE_PATH_USR1);
+      std::cout << "saved cached data in " << SAVE_PATH_USR1 << "\n";
+      break;
+    default:
+      break;
+    }
+}
+
+static void listen_signals()
+{
+  memset(&act, 0, sizeof(act));
+  act.sa_sigaction = sighandler;
+  sigaction(SIGINT, &act, NULL);
+  sigaction(SIGHUP, &act, NULL);
+  sigaction(SIGUSR1, &act, NULL);
+}
+
+static int run_server(int argc, char **argv)
 {
   try
   {
@@ -14,19 +43,20 @@ int run_server(int argc, char **argv)
       return 1;
     }
     short port = std::atoi(argv[1]);
+    listen_signals();
+
+    storage = std::make_shared<MmapStorage>(MMAP_STORAGE, MMAP_SIZE);
+    cache = std::make_shared<Cache>(storage);
+    Protocol protocol(cache);
 
     std::cout << "server listen localhost on port " << port << "\n"
       << "accepted commands:\n"
       << "set <key> <val> [<time to live in sec>]\n"
       << "get <key>\n"
-      << "remove <key>\n"
-      << "usr1(save cache in file)\n";
+      << "remove <key>\n";
 
-    auto storage = std::make_shared<MmapStorage>("/tmp/memcached_analog", 1024 * 1024);
-    auto cache = std::make_shared<Cache>(storage);
-    Protocol protocol(cache);
-    ThreadedServer server(port, protocol);
-    //AsyncServer server(port, protocol);
+    //ThreadedServer server(port, protocol);
+    AsyncServer server(port, protocol);
   }
   catch (const std::exception& e)
   {
@@ -36,13 +66,14 @@ int run_server(int argc, char **argv)
   return 0;
 }
 
-int run_tests(int argc, char **argv)
+static int run_tests(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   if (argc > 1 && strcmp(argv[1], "test") == 0)
     return run_tests(argc, argv);
 

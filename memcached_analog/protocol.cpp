@@ -2,19 +2,12 @@
 #include <regex>
 #include <iostream>
 
-const std::string Protocol::SAVE_PATH = "/tmp/memcached_analog.txt";
+
 
 Protocol::Command::Command(const std::string &text)
 {
   ttl = 0;
   std::smatch matched;
-
-  std::regex usr1_expr("^\\s*(usr1)\\s*$");
-  if (std::regex_match(text, matched, usr1_expr))
-  {
-    cmd = matched[1];
-    return;
-  }
 
   std::regex key_expr("^\\s*(get|remove)\\s+(\\S+)\\s*$");
   if (std::regex_match(text, matched, key_expr))
@@ -36,9 +29,6 @@ Protocol::Command::Command(const std::string &text)
 
 bool Protocol::Command::is_valid() const
 {
-  if (cmd == "usr1")
-    return true;
-
   bool valid = !cmd.empty() && !key.empty();
 
   if (cmd == "set")
@@ -58,12 +48,7 @@ std::string Protocol::process(const std::string &text)
   if (!cmd.is_valid())
     return "invalid command";
 
-  if (cmd.cmd == "usr1")
-  {
-    _cache->save(SAVE_PATH);
-    return "saved in " + SAVE_PATH;
-  }
-  else if (cmd.cmd == "set")
+  if (cmd.cmd == "set")
     _cache->set(cmd.key, cmd.val, cmd.ttl);
   else if (cmd.cmd == "get")
     return _cache->get(cmd.key);
