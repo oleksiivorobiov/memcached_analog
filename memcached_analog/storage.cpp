@@ -81,6 +81,7 @@ void MmapStorage::sync_mem_and_file() const
   {
     offset += sprintf((char*)_mmapped + offset, "%s\n%s\n", key.c_str(), val.c_str());
   });
+  msync(_mmapped, _size, MS_SYNC);
 }
 
 void MmapStorage::load_from_file()
@@ -100,6 +101,6 @@ void MmapStorage::load_from_file()
       _mem_storage.set(key, s);
       key.clear();
     }
-    mem_begin = mem_end + 1;
+    mem_begin = (char*)mem_end + 1;
   }
 }

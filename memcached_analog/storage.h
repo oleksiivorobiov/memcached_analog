@@ -30,7 +30,6 @@ class MmapStorage : public StorageInterface
   int _file_descr;
   void *_mmapped;
   MemoryStorage _mem_storage;
-  void sync_mem_and_file() const;
   void load_from_file();
 public:
   MmapStorage(const std::string &file_path, size_t size);
@@ -39,6 +38,7 @@ public:
   std::string get(const std::string &key) override;
   void remove(const std::string &key) override;
   void traverse(std::function<void(const std::string &key, const std::string &val)> callback) const override;
+  void sync_mem_and_file() const;
 };
 
 #endif // STORAGE_H
