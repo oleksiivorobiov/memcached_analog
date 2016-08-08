@@ -46,3 +46,7 @@ make
 ```
 telnet localhost 1234
 ```
+
+# todo
+* use socket.read_until
+* удалять записи из invalidator-контейнера
